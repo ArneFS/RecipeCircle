@@ -1,35 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <div className="min-h-screen bg-amber-100 text-gray-800 flex flex-col items-center justify-center p-6 font-sans">
+      {/* Logo / App Name */}
+      <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 text-amber-600">
+        RecipeCircle
+      </h1>
+
+      {/* Description */}
+      <p className="text-base md:text-lg text-center max-w-md mb-8">
+        Save and share your family’s favorite recipes — beautifully preserved for generations.
       </p>
-    </>
-  )
+
+      {/* Call to Action */}
+      <button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-6 rounded-xl shadow transition">
+        Get Started
+      </button>
+    </div>
+  );
 }
 
-export default App
+export default App;
