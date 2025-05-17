@@ -1,31 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  
-  const { signup } = useAuth();
+
+  const { signup, currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/');
+    }
+  }, [currentUser, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
+    // Basic password confirmation check
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
     }
-    
+
     try {
       setError('');
       setLoading(true);
+      console.log('🟡 Signing up with:', email, displayName);
+
       await signup(email, password, displayName);
-      setSuccess(true);
+
+      console.log('✅ Signup successful, redirecting...');
+      navigate('/');
     } catch (error) {
-      setError('Failed to create an account: ' + error.message);
+      console.error('❌ Signup error:', error);
+
+      if (error.code === 'auth/email-already-in-use') {
+        setError('An account with this email already exists. Please log in instead.');
+      } else if (error.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters.');
+      } else if (error.code === 'auth/invalid-email') {
+        setError('Invalid email address.');
+      } else {
+        setError('Failed to create an account: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -33,15 +56,18 @@ export default function Signup() {
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-serif text-center mb-6">Create Your Account</h2>
-      
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-      {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">Account created successfully!</div>}
-      
+      <h2 className="text-2xl font-serif text-center mb-6">Create an Account</h2>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="displayName">
-            Full Name
+          <label htmlFor="displayName" className="block text-gray-700 mb-2">
+            Display Name
           </label>
           <input
             id="displayName"
@@ -52,9 +78,9 @@ export default function Signup() {
             required
           />
         </div>
-        
+
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="email">
+          <label htmlFor="email" className="block text-gray-700 mb-2">
             Email
           </label>
           <input
@@ -66,9 +92,9 @@ export default function Signup() {
             required
           />
         </div>
-        
+
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="password">
+          <label htmlFor="password" className="block text-gray-700 mb-2">
             Password
           </label>
           <input
@@ -80,9 +106,9 @@ export default function Signup() {
             required
           />
         </div>
-        
+
         <div className="mb-6">
-          <label className="block text-gray-700 mb-2" htmlFor="confirmPassword">
+          <label htmlFor="confirmPassword" className="block text-gray-700 mb-2">
             Confirm Password
           </label>
           <input
@@ -94,7 +120,7 @@ export default function Signup() {
             required
           />
         </div>
-        
+
         <button
           type="submit"
           disabled={loading}
@@ -103,12 +129,16 @@ export default function Signup() {
           {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
-      
+
       <div className="mt-4 text-center">
         <p className="text-gray-600">
-          Already have an account? <a href="/login" className="text-amber-600 hover:text-amber-800">Log In</a>
+          Already have an account?{' '}
+          <a href="/login" className="text-amber-600 hover:text-amber-800">
+            Log in here
+          </a>
         </p>
       </div>
     </div>
   );
 }
+

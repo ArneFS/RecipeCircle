@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom'; // ✅ Add this import
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
-  const navigate = useNavigate(); // ✅ Initialize navigate
 
-  // ✅ Updated handleSubmit with redirect
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   async function handleSubmit(e) {
     e.preventDefault();
+    console.log('🟡 Form submitted with:', email);
 
     try {
       setError('');
       setLoading(true);
-      await login(email, password);   // Login via Firebase
-      navigate('/');                  // Redirect to dashboard after success
+      console.log('🟡 Attempting login...');
+      await login(email, password);
+      console.log('✅ Login successful');
+      navigate('/'); // Redirect to dashboard
     } catch (error) {
+      console.error('❌ Login failed:', error);
       setError('Failed to sign in: ' + error.message);
     } finally {
       setLoading(false);
@@ -30,9 +33,13 @@ export default function Login() {
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-serif text-center mb-6">Welcome Back</h2>
-      
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-      
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700 mb-2" htmlFor="email">
@@ -47,7 +54,7 @@ export default function Login() {
             required
           />
         </div>
-        
+
         <div className="mb-6">
           <label className="block text-gray-700 mb-2" htmlFor="password">
             Password
@@ -61,12 +68,15 @@ export default function Login() {
             required
           />
           <div className="mt-1 text-right">
-            <a href="/forgot-password" className="text-sm text-amber-600 hover:text-amber-800">
+            <a
+              href="/forgot-password"
+              className="text-sm text-amber-600 hover:text-amber-800"
+            >
               Forgot Password?
             </a>
           </div>
         </div>
-        
+
         <button
           type="submit"
           disabled={loading}
@@ -75,10 +85,16 @@ export default function Login() {
           {loading ? 'Signing In...' : 'Log In'}
         </button>
       </form>
-      
+
       <div className="mt-4 text-center">
         <p className="text-gray-600">
-          Don't have an account? <a href="/signup" className="text-amber-600 hover:text-amber-800">Sign Up</a>
+          Don't have an account?{' '}
+          <a
+            href="/signup"
+            className="text-amber-600 hover:text-amber-800"
+          >
+            Sign Up
+          </a>
         </p>
       </div>
     </div>
