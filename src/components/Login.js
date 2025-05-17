@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom'; // ✅ Add this import
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -8,15 +9,17 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
+  const navigate = useNavigate(); // ✅ Initialize navigate
 
+  // ✅ Updated handleSubmit with redirect
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     try {
       setError('');
       setLoading(true);
-      await login(email, password);
-      // Redirect will be handled by the router
+      await login(email, password);   // Login via Firebase
+      navigate('/');                  // Redirect to dashboard after success
     } catch (error) {
       setError('Failed to sign in: ' + error.message);
     } finally {
