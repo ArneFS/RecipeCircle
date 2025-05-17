@@ -23,19 +23,26 @@ export default function Signup() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Basic password confirmation check
+    // Log values to confirm inputs
+    console.log("📧 Email:", email);
+    console.log("🔐 Password:", password);
+    console.log("👤 Display Name:", displayName);
+    console.log("✅ Confirm Password:", confirmPassword);
+
+    // Validate inputs
+    if (!email || !password || !confirmPassword || !displayName) {
+      return setError('All fields are required.');
+    }
+
     if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+      return setError('Passwords do not match.');
     }
 
     try {
       setError('');
       setLoading(true);
-      console.log('🟡 Signing up with:', email, displayName);
-
       await signup(email, password, displayName);
-
-      console.log('✅ Signup successful, redirecting...');
+      console.log("✅ Signup successful — redirecting...");
       navigate('/');
     } catch (error) {
       console.error('❌ Signup error:', error);
@@ -46,6 +53,8 @@ export default function Signup() {
         setError('Password should be at least 6 characters.');
       } else if (error.code === 'auth/invalid-email') {
         setError('Invalid email address.');
+      } else if (error.code === 'auth/invalid-credential') {
+        setError('Invalid email or password.');
       } else {
         setError('Failed to create an account: ' + error.message);
       }
@@ -141,4 +150,3 @@ export default function Signup() {
     </div>
   );
 }
-
